@@ -1,0 +1,106 @@
+model Stores {
+    user        Users      @relation(fields: [user_id], references: [id])
+    user_id     Int        @id @map("user_id")
+    name        String     @db.VarChar(100)
+    description String     @db.Text
+    products    Products[]
+
+    @@map("stores")
+}
+
+model ProductCategories {
+    code    String                     @id @db.VarChar(10)
+    name    String                     @db.VarChar(100)
+    product productCategoryRelations[]
+
+    @@map("product_categories")
+}
+
+model Products {
+    id          String                     @id
+    store       Stores                     @relation(fields: [store_id], references: [user_id])
+    store_id    Int
+    name        String                     @db.VarChar(100)
+    description String                     @db.Text
+    price       Decimal                    @default(0.00) @db.Decimal(15, 2)
+    stock       Int                        @default(0)
+    created_at  DateTime                   @default(now())
+    discount    Int                        @default(0)
+    category    productCategoryRelations[]
+    images      ProductImages[]
+    variations  ProductVariations[]
+    reviews     ProductReviews[]
+    carts       CartItems[]
+
+    @@map("products")
+}
+
+model productCategoryRelations {
+    product       Products          @relation(fields: [product_id], references: [id], onDelete: Cascade)
+    product_id    String
+    category      ProductCategories @relation(fields: [category_code], references: [code], onDelete: Cascade)
+    category_code String
+
+    @@id([product_id, category_code])
+    @@map("product_category_relations")
+}
+
+model ProductImages {
+    id         Int      @id @default(autoincrement())
+    product    Products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+    product_id String
+    image_url  String   @db.Text
+
+    @@map("product_images")
+}
+
+model ProductVariations {
+    id         Int         @id @default(autoincrement())
+    product    Products    @relation(fields: [product_id], references: [id], onDelete: Cascade)
+    product_id String
+    name       String      @db.VarChar(100)
+    value      String      @db.VarChar(100)
+    price      Decimal     @default(0.00) @db.Decimal(15, 2)
+    stock      Int         @default(0)
+    carts      CartItems[]
+
+    @@map("product_variations")
+}
+
+model ProductReviews {
+    id         Int      @id @default(autoincrement())
+    product    Products @relation(fields: [product_id], references: [id], onDelete: Cascade)
+    product_id String
+    user       Users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    user_id    Int
+    rating     Int      @default(5)
+    review     String   @db.Text
+    created_at DateTime @default(now())
+
+    @@map("product_reviews")
+}
+
+model Carts {
+    id         Int         @id @default(autoincrement())
+    user       Users       @relation(fields: [user_id], references: [id])
+    user_id    Int         @unique
+    created_at DateTime    @default(now())
+    updated_at DateTime    @updatedAt
+    items      CartItems[]
+
+    @@map("carts")
+}
+
+model CartItems {
+    id           Int               @id @default(autoincrement())
+    cart         Carts             @relation(fields: [cart_id], references: [id], onDelete: Cascade)
+    cart_id      Int
+    product      Products          @relation(fields: [product_id], references: [id])
+    product_id   String
+    variation    ProductVariations @relation(fields: [variation_id], references: [id])
+    variation_id Int
+    quantity     Int               @default(1)
+    created_at   DateTime          @default(now())
+
+    @@map("cart_items")
+}

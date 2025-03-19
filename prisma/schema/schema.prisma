@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Permissions {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique
+  description String            @db.Text
+  roles       RolePermissions[]
+
+  @@map("permissions")
+}
+
+model Roles {
+  id          Int               @id @default(autoincrement())
+  name        String            @unique @db.VarChar(100)
+  permissions RolePermissions[]
+  Users       Users[]
+
+  @@map("roles")
+}
+
+model RolePermissions {
+  role          Roles       @relation(fields: [role_id], references: [id], onDelete: Cascade)
+  role_id       Int
+  permission    Permissions @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+  permission_id Int
+
+  @@id([role_id, permission_id])
+  @@map("role_permissions")
+}
+
+model Users {
+  id            Int              @id @default(autoincrement())
+  role          Roles            @relation(fields: [role_id], references: [id], onDelete: Restrict)
+  role_id       Int
+  name          String           @db.VarChar(100)
+  email         String           @unique @db.VarChar(100)
+  password      String           @db.VarChar(255)
+  refresh_token String?          @db.VarChar(255)
+  created_at    DateTime         @default(now())
+  updated_at    DateTime         @updatedAt
+  wallet        Wallets?
+  profile       Profiles?
+  addresses     Addresses[]
+  store         Stores?
+  reviews       ProductReviews[]
+  cart          Carts?
+
+  @@map("users")
+}
+
+model Profiles {
+  user_id         Int       @id @map("user_id")
+  birth_date      DateTime?
+  gender          String?
+  profile_picture String?
+  user            Users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Addresses {
+  id            Int     @id @default(autoincrement())
+  user          Users   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id       Int
+  address_label String  @db.VarChar(20)
+  phone_number  String  @db.VarChar(20)
+  address       String  @db.Text
+  city          String  @db.VarChar(100)
+  province      String  @db.VarChar(100)
+  postal_code   String  @db.VarChar(10)
+  country       String  @db.VarChar(100)
+  is_default    Boolean @default(true)
+}

@@ -1,0 +1,20 @@
+model Wallets {
+    user_id          Int                  @id @map("user_id")
+    balance          Decimal              @default(0.00) @db.Decimal(15, 2)
+    platform_balance Decimal              @default(0.00) @db.Decimal(15, 2)
+    user             Users                @relation(fields: [user_id], references: [id])
+    transactions     WalletTransactions[]
+
+    @@unique([user_id])
+    @@map("wallets")
+}
+
+model WalletTransactions {
+    id               Int      @id @default(autoincrement())
+    wallet           Wallets  @relation(fields: [wallet_id], references: [user_id], onDelete: Cascade)
+    wallet_id        Int
+    transaction_type String   @db.VarChar(100)
+    created_at       DateTime @default(now())
+
+    @@map("wallet_transactions")
+}
