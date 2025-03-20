@@ -25,7 +25,11 @@ async function bootstrap() {
 
   app.use('/profiles', express.static('uploads/profiles'));
 
-  app.enableCors(configService.get<boolean>('ENABLE_CORS'));
+  app.enableCors({
+    origin: configService.get<string>('CORS_ORIGIN')?.split(','),
+    methods: configService.get<string>('CORS_METHODS'),
+    credentials: configService.get<boolean>('CORS_CREDENTIALS'),
+  });
 
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());

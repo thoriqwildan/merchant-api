@@ -13,5 +13,9 @@ export const validationSchema = Joi.object({
 
   JWT_REFRESH: Joi.string().required(),
 
-  ENABLE_CORS: Joi.boolean().default(true),
+  CORS_ORIGIN: Joi.string().default('*'),
+
+  CORS_METHODS: Joi.string().default('GET,HEAD,PUT,PATCH,POST,DELETE'),
+
+  CORS_CREDENTIALS: Joi.boolean().default(true),
 });
