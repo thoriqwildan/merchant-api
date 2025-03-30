@@ -1,5 +1,5 @@
 model Stores {
-    user        Users      @relation(fields: [user_id], references: [id])
+    user        Users      @relation(fields: [user_id], references: [id], onDelete: Cascade)
     user_id     Int        @id @map("user_id")
     name        String     @db.VarChar(100)
     description String     @db.Text
@@ -82,7 +82,7 @@ model ProductReviews {
 
 model Carts {
     id         Int         @id @default(autoincrement())
-    user       Users       @relation(fields: [user_id], references: [id])
+    user       Users       @relation(fields: [user_id], references: [id], onDelete: Cascade)
     user_id    Int         @unique
     created_at DateTime    @default(now())
     updated_at DateTime    @updatedAt

@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import * as express from 'express';
+import { apiReference } from '@scalar/nestjs-api-reference';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,7 +19,14 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('docs', app, document);
+
+  app.use(
+    '/docs',
+    apiReference({
+      theme: 'deepSpace',
+      spec: { content: document },
+    }),
+  );
 
   console.log(`App Environment: ${configService.get<string>('NODE_ENV')}`);
   console.log(`Running on port: ${configService.get<number>('PORT')}`);

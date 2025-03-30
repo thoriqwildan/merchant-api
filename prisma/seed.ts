@@ -47,6 +47,42 @@ async function main() {
     },
   });
 
+  await prisma.permissions.upsert({
+    where: { name: 'create_users' },
+    update: {},
+    create: {
+      name: 'create_users',
+      description: 'You can create user with this permission',
+    },
+  });
+
+  await prisma.permissions.upsert({
+    where: { name: 'read_users' },
+    update: {},
+    create: {
+      name: 'read_users',
+      description: 'You can read user with this permission',
+    },
+  });
+
+  await prisma.permissions.upsert({
+    where: { name: 'update_users' },
+    update: {},
+    create: {
+      name: 'update_users',
+      description: 'You can update user with this permission',
+    },
+  });
+
+  await prisma.permissions.upsert({
+    where: { name: 'delete_users' },
+    update: {},
+    create: {
+      name: 'delete_users',
+      description: 'You can delete user with this permission',
+    },
+  });
+
   const administrator = await prisma.roles.upsert({
     where: { name: 'administrator' },
     update: {},

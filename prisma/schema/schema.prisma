@@ -42,6 +42,12 @@ model RolePermissions {
   @@map("role_permissions")
 }
 
+enum Status {
+  active
+  inactive
+  banned
+}
+
 model Users {
   id            Int              @id @default(autoincrement())
   role          Roles            @relation(fields: [role_id], references: [id], onDelete: Restrict)
@@ -52,6 +58,7 @@ model Users {
   refresh_token String?          @db.VarChar(255)
   created_at    DateTime         @default(now())
   updated_at    DateTime         @updatedAt
+  status        Status           @default(active)
   wallet        Wallets?
   profile       Profiles?
   addresses     Addresses[]

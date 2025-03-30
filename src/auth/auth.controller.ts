@@ -33,7 +33,6 @@ export class AuthController {
 
   @UseGuards(JwtPermissionGuard)
   @ApiBearerAuth()
-  @Permissions('all_permissions')
   @Get('test')
   test() {
     return 'Coba Token';

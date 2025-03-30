@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -55,7 +60,7 @@ export class AuthService {
     const token = await this.getTokens({
       sub: data.id,
       email: data.email,
-      role: data.role.name,
+      status: data.status,
       permissions,
     });
 
@@ -78,6 +83,9 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Email not found!');
     }
+    if (user.status === 'banned') {
+      throw new UnauthorizedException('Your account has been banned!');
+    }
     const isPasswordMatch = await bcrypt.compare(
       signInDto.password,
       user.password,
@@ -91,7 +99,7 @@ export class AuthService {
     const token = await this.getTokens({
       sub: user.id,
       email: user.email,
-      role: user.role.name,
+      status: user.status,
       permissions,
     });
     return token;
@@ -119,7 +127,7 @@ export class AuthService {
     const token = await this.getTokens({
       sub: user.id,
       email: user.email,
-      role: user.role.name,
+      status: user.status,
       permissions,
     });
 
@@ -136,7 +144,7 @@ export class AuthService {
   async getTokens(payload: {
     sub: number;
     email: string;
-    role: string;
+    status: string;
     permissions: string[];
   }): Promise<{ accessToken; refreshToken }> {
     const accessToken = this.jwtService.sign(payload, {

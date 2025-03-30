@@ -1,29 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { Roles } from '@prisma/client';
 import { PaginationResponseDto } from 'src/common/dto/pagination-response.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
-export class RoleRepositories {
+export class UserRepositories {
   constructor(private prismaService: PrismaService) {}
 
   async findManyWithPagination(
     paginationDto: PaginationDto,
-  ): Promise<PaginationResponseDto<Roles[]>> {
+  ): Promise<PaginationResponseDto<any[]>> {
     const { page, limit } = paginationDto;
     const skip = (page! - 1) * limit!;
 
     const [data, total] = await Promise.all([
-      this.prismaService.roles.findMany({
+      this.prismaService.users.findMany({
         skip,
         take: Number(limit),
         orderBy: { id: 'asc' },
-        include: {
-          permissions: { select: { permission: { select: { name: true } } } },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          created_at: true,
+          updated_at: true,
+          status: true,
+          role: {
+            select: { id: true, name: true },
+          },
         },
       }),
-      this.prismaService.roles.count(),
+      this.prismaService.users.count(),
     ]);
 
     return {

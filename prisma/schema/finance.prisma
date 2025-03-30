@@ -2,7 +2,7 @@ model Wallets {
     user_id          Int                  @id @map("user_id")
     balance          Decimal              @default(0.00) @db.Decimal(15, 2)
     platform_balance Decimal              @default(0.00) @db.Decimal(15, 2)
-    user             Users                @relation(fields: [user_id], references: [id])
+    user             Users                @relation(fields: [user_id], references: [id], onDelete: Cascade)
     transactions     WalletTransactions[]
 
     @@unique([user_id])
