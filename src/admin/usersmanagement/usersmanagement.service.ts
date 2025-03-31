@@ -107,14 +107,14 @@ export class UsersmanagementService {
       throw new BadRequestException('User not found');
     }
 
-    fs.unlinkSync(`uploads/profiles/${checkUser.profile?.profile_picture}`);
+    try {
+      fs.unlinkSync(`uploads/${checkUser.profile?.profile_picture}`);
+    } catch (error) {
+      console.log('Error deleting file: ', error);
+    }
 
     await this.prismaService.users.delete({
       where: { id },
-    });
-
-    await this.prismaService.profiles.delete({
-      where: { user_id: checkUser.id },
     });
 
     return { message: 'User deleted' };
